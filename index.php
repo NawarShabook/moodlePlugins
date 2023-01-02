@@ -16,7 +16,7 @@
 
 /**
  * @package     local_greetings
- * @copyright   2022 Nawar Shabook <nawarshabook@gmail.com>
+ * @copyright   2023 Nawar Shabook <nawarshabook@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
@@ -24,6 +24,8 @@
 // begin with requiring the config.php file,
 // located in the root of the Moodle folder.
 require_once('../../config.php'); 
+require_once($CFG->dirroot. '/local/greetings/lib.php');
+
 
 $context = context_system::instance();
 $PAGE->set_context($context);
@@ -42,4 +44,10 @@ echo (isloggedin())?'<h2>Greetings, ' . fullname($USER) . '</h2>': '<h2>Greeting
 // } else {
 //     echo '<h2>Greetings, user</h2>';
 // }?
+echo (isloggedin())? get_string('greetingloggedinuser', 'local_greetings', fullname($USER)):
+get_string('greetinguser', 'local_greetings');
+
+echo '<br>'. local_greetings_get_greeting($USER);
+
+
 echo $OUTPUT->footer();
