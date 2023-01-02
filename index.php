@@ -12,33 +12,34 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>;.
 
 /**
- * Plugin strings are defined here.
- *
  * @package     local_greetings
- * @category    string
  * @copyright   2022 Nawar Shabook <nawarshabook@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*/
 
-defined('MOODLE_INTERNAL') || die();
+// Most php files that can be directly accessed
+// begin with requiring the config.php file,
+// located in the root of the Moodle folder.
+require_once('../../config.php'); 
 
-$string['pluginname'] = 'Greetings';
-
-/*
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/greetings/index.php'));
 $PAGE->set_pagelayout('standard');
+
+// We are making use of global variable $SITE
+// to access details about the Moodle site.
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
+
 echo $OUTPUT->header();
-echo html_writer::tag('input', '', [
-        'type' => 'text',
-        'name' => 'username',
-        'placeholder' => get_string('typeyourname', 'local_greetings'),
-    ]); 
+echo (isloggedin())?'<h2>Greetings, ' . fullname($USER) . '</h2>': '<h2>Greetings, user</h2>';
+// if (isloggedin()) {
+//     echo '<h2>Greetings, ' . fullname($USER) . '</h2>';
+// } else {
+//     echo '<h2>Greetings, user</h2>';
+// }?
 echo $OUTPUT->footer();
-*/
