@@ -25,7 +25,7 @@
 // located in the root of the Moodle folder.
 require_once('../../config.php'); 
 require_once($CFG->dirroot. '/local/greetings/lib.php');
-
+require_once($CFG->dirroot. '/local/greetings/message_form.php');
 
 $context = context_system::instance();
 $PAGE->set_context($context);
@@ -37,6 +37,9 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
 
+$messageform = new local_greetings_message_form();
+
+//header
 echo $OUTPUT->header();
 echo (isloggedin())?'<h2>Greetings, ' . fullname($USER) . '</h2>': '<h2>Greetings, user</h2>';
 // if (isloggedin()) {
@@ -49,5 +52,13 @@ get_string('greetinguser', 'local_greetings');
 
 echo '<br>'. local_greetings_get_greeting($USER);
 
-
+$messageform->display();
+//bellow for check what data has been submitted by the form.
+if ($data = $messageform->get_data()) {
+    //var_dump($data); //simple way for test what we are doing
+    
+    $message = required_param('message', PARAM_TEXT);
+    echo $OUTPUT->heading($message, 4);
+}
+//footer
 echo $OUTPUT->footer();
