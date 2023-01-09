@@ -51,5 +51,5 @@ class local_greetings_message_form extends moodleform {
     /*Notice that for the submit button label we are reusing one of
     Moodle's core language strings "submit". However, for the textarea input,
     we will be defining our own language string.*/
-
+    
 }

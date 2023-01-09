@@ -37,3 +37,5 @@ $string['greetingusertr'] = 'Merhaba, {$a}.';
 
 //for message
 $string['yourmessage'] = 'Your message';
+//for know who submit the message
+$string['postedby'] = 'Posted by {$a}.';

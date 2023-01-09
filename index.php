@@ -48,6 +48,7 @@ if ($data = $messageform->get_data()) {
         $record = new stdClass;
         $record->message = $message;
         $record->timecreated = time();
+        $record->userid = $USER->id;
 
         $DB->insert_record('local_greetings_messages', $record);
     }
@@ -82,7 +83,16 @@ echo '<br>'. local_greetings_get_greeting($USER);
 $messageform->display(); //for display form
 
 //This line bellow fetches all the greeting messages from the table local_greetings_message.
-$messages = $DB->get_records('local_greetings_messages');
+// $messages = $DB->get_records('local_greetings_messages');
+$userfields = \core_user\fields::for_name()->with_identity($context);
+$userfieldssql = $userfields->get_sql('u');
+
+$sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
+          FROM {local_greetings_messages} m
+     LEFT JOIN {user} u ON u.id = m.userid
+      ORDER BY timecreated DESC";
+
+$messages = $DB->get_records_sql($sql);
 echo $OUTPUT->box_start('card-columns');
 
 //We will use Bootstrap Card columns
@@ -90,6 +100,7 @@ foreach ($messages as $m) {
     echo html_writer::start_tag('div', array('class' => 'card'));
     echo html_writer::start_tag('div', array('class' => 'card-body'));
     echo html_writer::tag('p', $m->message, array('class' => 'card-text'));
+    echo html_writer::tag('p', get_string('postedby', 'local_greetings', $m->firstname), array('class' => 'card-text'));
     echo html_writer::start_tag('p', array('class' => 'card-text'));
     //userdate() is core function, which is part of the Time API is used to convert the timestamp into a human readable value.
     echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
