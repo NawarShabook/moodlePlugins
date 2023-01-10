@@ -37,8 +37,18 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
 
-$messageform = new local_greetings_message_form();
+//command bellow for require login, that's mean if the guest user try
+// to access to greetings plugin he will is redirected to login page
+require_login();
 
+//code bellow for prevent guest users from accessing the greetings plugin 
+if (isguestuser()) {
+    throw new moodle_exception('noguest');
+}
+
+
+
+$messageform = new local_greetings_message_form();
 //store message in database
 // dont worry if you dont understand something, bellow of code there is an explain for it
 if ($data = $messageform->get_data()) {
@@ -99,7 +109,7 @@ echo $OUTPUT->box_start('card-columns');
 foreach ($messages as $m) {
     echo html_writer::start_tag('div', array('class' => 'card'));
     echo html_writer::start_tag('div', array('class' => 'card-body'));
-    echo html_writer::tag('p', $m->message, array('class' => 'card-text'));
+    echo html_writer::tag('p', format_text($m->message, FORMAT_PLAIN), array('class' => 'card-text'));
     echo html_writer::tag('p', get_string('postedby', 'local_greetings', $m->firstname), array('class' => 'card-text'));
     echo html_writer::start_tag('p', array('class' => 'card-text'));
     //userdate() is core function, which is part of the Time API is used to convert the timestamp into a human readable value.

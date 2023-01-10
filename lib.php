@@ -50,6 +50,10 @@ function local_greetings_get_greeting($user) {
  */
 function local_greetings_extend_navigation_frontpage(navigation_node $frontpage)
 {
+    if (isguestuser()) {
+        // throw new moodle_exception('noguest');
+        return;
+    }
     $frontpage->add(
         get_string('pluginname', 'local_greetings'),
         new moodle_url('/local/greetings/index.php'),
@@ -63,6 +67,10 @@ function local_greetings_extend_navigation_frontpage(navigation_node $frontpage)
 // funciton for Add a link to the navigation drawer
 function local_greetings_extend_navigation(global_navigation $root)
 {
+    if (isguestuser()) {
+        // throw new moodle_exception('noguest');
+        return;
+    }
     $node = navigation_node::create(
         get_string('pluginname', 'local_greetings'),
         new moodle_url('/local/greetings/index.php')
