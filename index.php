@@ -37,6 +37,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
 
+
 //command bellow for require login, that's mean if the guest user try
 // to access to greetings plugin he will is redirected to login page
 require_login();
@@ -45,13 +46,29 @@ require_login();
 if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
+//capability section of code
+//The code bellow checks whether or not a user has the capability to make,view,delete a post.
+$allowpost = has_capability('local/greetings:postmessages', $context);
+$allowview = has_capability('local/greetings:viewmessages', $context);
+//delete capability and db for it
+$deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
+$action = optional_param('action', '', PARAM_TEXT);
 
+if ($action == 'del') {
+    $id = required_param('id', PARAM_TEXT);
 
+    if ($deleteanypost) {
+        $params = array('id' => $id);
+
+        $DB->delete_records('local_greetings_messages', $params);
+    }
+}
 
 $messageform = new local_greetings_message_form();
 //store message in database
 // dont worry if you dont understand something, bellow of code there is an explain for it
 if ($data = $messageform->get_data()) {
+    require_capability('local/greetings:postmessages', $context);
     $message = required_param('message', PARAM_TEXT);
 
     if (!empty($message)) {
@@ -90,34 +107,55 @@ get_string('greetinguser', 'local_greetings');
 
 echo '<br>'. local_greetings_get_greeting($USER);
 
-$messageform->display(); //for display form
-
+//bellow for check if the user has the relevant permission.
+if ($allowpost) {
+    $messageform->display(); //for display form
+} 
 //This line bellow fetches all the greeting messages from the table local_greetings_message.
 // $messages = $DB->get_records('local_greetings_messages');
-$userfields = \core_user\fields::for_name()->with_identity($context);
-$userfieldssql = $userfields->get_sql('u');
 
-$sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
-          FROM {local_greetings_messages} m
-     LEFT JOIN {user} u ON u.id = m.userid
-      ORDER BY timecreated DESC";
+if($allowview){
+    $userfields = \core_user\fields::for_name()->with_identity($context);
+    $userfieldssql = $userfields->get_sql('u');
 
-$messages = $DB->get_records_sql($sql);
-echo $OUTPUT->box_start('card-columns');
+    $sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
+            FROM {local_greetings_messages} m
+        LEFT JOIN {user} u ON u.id = m.userid
+        ORDER BY timecreated DESC";
 
-//We will use Bootstrap Card columns
-foreach ($messages as $m) {
-    echo html_writer::start_tag('div', array('class' => 'card'));
-    echo html_writer::start_tag('div', array('class' => 'card-body'));
-    echo html_writer::tag('p', format_text($m->message, FORMAT_PLAIN), array('class' => 'card-text'));
-    echo html_writer::tag('p', get_string('postedby', 'local_greetings', $m->firstname), array('class' => 'card-text'));
-    echo html_writer::start_tag('p', array('class' => 'card-text'));
-    //userdate() is core function, which is part of the Time API is used to convert the timestamp into a human readable value.
-    echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
-    echo html_writer::end_tag('p');
-    echo html_writer::end_tag('div');
-    echo html_writer::end_tag('div');
+    $messages = $DB->get_records_sql($sql);
+    echo $OUTPUT->box_start('card-columns');
+
+    //We will use Bootstrap Card columns
+    foreach ($messages as $m) {
+        
+        echo html_writer::start_tag('div', array('class' => 'card'));
+        echo html_writer::start_tag('div', array('class' => 'card-body'));
+        echo html_writer::tag('p', format_text($m->message, FORMAT_PLAIN), array('class' => 'card-text'));
+        echo html_writer::tag('p', get_string('postedby', 'local_greetings', $m->firstname), array('class' => 'card-text'));
+        echo html_writer::start_tag('p', array('class' => 'card-text'));
+        //userdate() is core function, which is part of the Time API is used to convert the timestamp into a human readable value.
+        echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
+        
+        //check if the user has delete capability to display delete button to him
+        if ($deleteanypost) {
+            echo html_writer::start_tag('p', array('class' => 'card-footer text-center'));
+            echo html_writer::link(
+                new moodle_url(
+                    '/local/greetings/index.php',
+                    array('action' => 'del', 'id' => $m->id)
+                ),
+                $OUTPUT->pix_icon('t/delete', '') . get_string('delete')
+            );
+            echo html_writer::end_tag('p');
+        }
+
+        echo html_writer::end_tag('p');
+        echo html_writer::end_tag('div');
+        echo html_writer::end_tag('div');
 }
+}
+
 
 echo $OUTPUT->box_end();
 

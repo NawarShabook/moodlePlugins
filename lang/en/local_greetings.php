@@ -39,3 +39,7 @@ $string['greetingusertr'] = 'Merhaba, {$a}.';
 $string['yourmessage'] = 'Your message';
 //for know who submit the message
 $string['postedby'] = 'Posted by {$a}.';
+//language strings for Control access using capabilities
+$string['greetings:viewmessages'] = 'View messages on the Greetings wall';
+$string['greetings:postmessages'] = 'Post a new message on the Greetings wall';
+$string['greetings:deleteanymessage'] = 'Delete a message on the Greetings wall';
