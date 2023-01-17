@@ -43,3 +43,7 @@ $string['postedby'] = 'Posted by {$a}.';
 $string['greetings:viewmessages'] = 'View messages on the Greetings wall';
 $string['greetings:postmessages'] = 'Post a new message on the Greetings wall';
 $string['greetings:deleteanymessage'] = 'Delete a message on the Greetings wall';
+
+//set config for plugins in UI
+$string['showinnavigation'] = 'Show in navigation';
+$string['showinnavigationdesc'] = 'When enabled will show link in navigation';
